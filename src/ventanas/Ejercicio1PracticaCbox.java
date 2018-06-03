@@ -26,8 +26,9 @@ import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
 
-public class Ejercicio1Practica extends JFrame {
+public class Ejercicio1PracticaCbox extends JFrame {
 
 	private JPanel contentPane;
 
@@ -37,8 +38,12 @@ public class Ejercicio1Practica extends JFrame {
 
 	JButton btnAnterior = new JButton("Anterior");
 	JButton btnSiguiente = new JButton("Siguiente");
+	
+	JComboBox cboxDepartamento = new JComboBox();
 
 	private Conexion miConexionXML = new Conexion();
+	
+	private int id;
 
 	/**
 	 * Launch the application.
@@ -47,7 +52,7 @@ public class Ejercicio1Practica extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Ejercicio1Practica frame = new Ejercicio1Practica();
+					Ejercicio1PracticaCbox frame = new Ejercicio1PracticaCbox();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -59,7 +64,7 @@ public class Ejercicio1Practica extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Ejercicio1Practica() {
+	public Ejercicio1PracticaCbox() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 468, 332);
 		contentPane = new JPanel();
@@ -131,19 +136,36 @@ public class Ejercicio1Practica extends JFrame {
 
 		btnSiguiente.setBounds(247, 244, 89, 23);
 		contentPane.add(btnSiguiente);
+		
+		
+		
+		cboxDepartamento.setBounds(96, 49, 182, 20);
+		contentPane.add(cboxDepartamento);
 
 		miConexionXML.conectar();
+		
+		rellenaComboDepartamentos();
+		
+		cboxDepartamento.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				String depYid = cboxDepartamento.getSelectedItem().toString().trim();
+				
+				String [] parteId = depYid.trim().split("- ");
+				
+				String idStr = parteId[1];
+				
+				id = Integer.parseInt(idStr);
+				
+				System.out.println(idStr);
+			}
+		});
 
 		btnConsultar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				if (txtNumeroDept.getText().equals("")) {
-
-					JOptionPane.showMessageDialog(null, "Introduzca un numero de Departamento");
-
-				} else {
-					consutarDepartamento(Integer.parseInt(txtNumeroDept.getText()));
-				}
+					consutarDepartamento(id);
+				
 			}
 		});
 
@@ -206,6 +228,29 @@ public class Ejercicio1Practica extends JFrame {
 				crearDepartamento();
 			}
 		});
+	}
+	
+	private void rellenaComboDepartamentos() {
+		
+		try {
+
+			ResourceSet result = miConexionXML.getServicio().query("/departamentos/DEP_ROW/concat(DNOMBRE, \" - \", DEPT_NO)");
+			//ResourceSet result = miConexionXML.getServicio().query("/departamentos/DEP_ROW/DEPT_NO/text()");
+			//ResourceSet result = miConexionXML.getServicio().query("/departamentos/DEP_ROW/DEPT_NO/text() | /departamentos/DEP_ROW/DNOMBRE/text()");
+			
+			ResourceIterator i;
+			i = result.getIterator();
+			
+			while(i.hasMoreResources()) {
+				
+				Resource r = i.nextResource();
+				cboxDepartamento.addItem(r.getContent());
+			}
+			
+		} catch (XMLDBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void consutarDepartamento(int id) {
