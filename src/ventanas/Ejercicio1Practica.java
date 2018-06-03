@@ -69,22 +69,22 @@ public class Ejercicio1Practica extends JFrame {
 		contentPane.setLayout(null);
 
 		JButton btnAlta = new JButton("Alta");
-		
+
 		btnAlta.setBounds(10, 210, 89, 23);
 		contentPane.add(btnAlta);
 
 		JButton btnBaja = new JButton("Baja");
-		
+
 		btnBaja.setBounds(115, 210, 89, 23);
 		contentPane.add(btnBaja);
 
 		JButton btnModificacion = new JButton("Modificacion");
-		
+
 		btnModificacion.setBounds(214, 210, 100, 23);
 		contentPane.add(btnModificacion);
 
 		JButton btnLimpiar = new JButton("Limpiar");
-		
+
 		btnLimpiar.setBounds(335, 210, 89, 23);
 		contentPane.add(btnLimpiar);
 
@@ -139,9 +139,9 @@ public class Ejercicio1Practica extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				if (txtNumeroDept.getText().equals("")) {
-					
-					JOptionPane.showMessageDialog(null,"Introduzca un numero de Departamento");
-					
+
+					JOptionPane.showMessageDialog(null, "Introduzca un numero de Departamento");
+
 				} else {
 					consutarDepartamento(Integer.parseInt(txtNumeroDept.getText()));
 				}
@@ -151,43 +151,59 @@ public class Ejercicio1Practica extends JFrame {
 		btnSiguiente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				nextDepartamento();
+				if (txtNumeroDept.getText().equals("")) {
+
+					txtNumeroDept.setText("0");
+					nextDepartamento();
+
+				} else {
+					nextDepartamento();
+				}
+
 			}
 
 		});
 
 		btnAnterior.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (txtNumeroDept.getText().equals("")) {
 
-				prevDepartamento();
+					txtNumeroDept.setText("0");
+					prevDepartamento();
+
+				} else {
+					prevDepartamento();
+				}
+
+				
 			}
 		});
-		
+
 		btnModificacion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			
+
 				modificarDepartamento();
 			}
 		});
-		
+
 		btnLimpiar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				limpiar();
 			}
 		});
-		
+
 		btnBaja.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				borrarDepartamento(Integer.parseInt(txtNumeroDept.getText()));
-				
+
 			}
 		});
-		
+
 		btnAlta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				crearDepartamento();
 			}
 		});
@@ -233,58 +249,61 @@ public class Ejercicio1Practica extends JFrame {
 		// labelMensajes.setText("");
 	}
 
-	private void modificarDepartamento(){
+	private void modificarDepartamento() {
 		try {
 			int id = Integer.parseInt(txtNumeroDept.getText());
-        	if(existsDepartamento(id)){
-	        	
-        		String replacement = BuildXML.createDepartamento(id, txtNombreDept.getText(), txtLocalidadDept.getText());
-				miConexionXML.getServicio().query("update replace /departamentos/DEP_ROW[DEPT_NO = "+id+"] with " + replacement);
-				
-				JOptionPane.showMessageDialog(null,"Departamento " + id + " modificado.");
-        	}else{
-        		JOptionPane.showMessageDialog(null,"El departamento " + id + " no existe. No se puede modificar");
-        	}
-        } catch (XMLDBException e) {
+			if (existsDepartamento(id)) {
+
+				String replacement = BuildXML.createDepartamento(id, txtNombreDept.getText(),
+						txtLocalidadDept.getText());
+				miConexionXML.getServicio()
+						.query("update replace /departamentos/DEP_ROW[DEPT_NO = " + id + "] with " + replacement);
+
+				JOptionPane.showMessageDialog(null, "Departamento " + id + " modificado.");
+			} else {
+				JOptionPane.showMessageDialog(null, "El departamento " + id + " no existe. No se puede modificar");
+			}
+		} catch (XMLDBException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private void borrarDepartamento(int id){
-        try {
-        	
-        	if(existsDepartamento(id)){
-	        	
-				miConexionXML.getServicio().query("update delete /departamentos/DEP_ROW[DEPT_NO = "+id+"]");
-				
-				JOptionPane.showMessageDialog(null,"Departamento " + id + " eliminado.");
-				
+
+	private void borrarDepartamento(int id) {
+		try {
+
+			if (existsDepartamento(id)) {
+
+				miConexionXML.getServicio().query("update delete /departamentos/DEP_ROW[DEPT_NO = " + id + "]");
+
+				JOptionPane.showMessageDialog(null, "Departamento " + id + " eliminado.");
+
 				limpiar();
-        	}else{
-        		JOptionPane.showMessageDialog(null,"El departamento " + id + " no se puede borrar, no existe.");
-        	}
-        } catch (XMLDBException e) {
+			} else {
+				JOptionPane.showMessageDialog(null, "El departamento " + id + " no se puede borrar, no existe.");
+			}
+		} catch (XMLDBException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private void crearDepartamento(){
+
+	private void crearDepartamento() {
 		try {
 			int id = Integer.parseInt(txtNumeroDept.getText());
-        	if(!existsDepartamento(id)){
-	        	
-        		String depart = BuildXML.createDepartamento(id, txtNombreDept.getText(), txtLocalidadDept.getText());
-				miConexionXML.getServicio().query("update insert "+depart+" into /departamentos");
-				
-				JOptionPane.showMessageDialog(null,"Departamento " + id + " guardado.");
-        	}else{
-        		JOptionPane.showMessageDialog(null,"El departamento " + id + " ya existe. No se puede volver a insertar");
-        	}
-        } catch (XMLDBException e) {
+			if (!existsDepartamento(id)) {
+
+				String depart = BuildXML.createDepartamento(id, txtNombreDept.getText(), txtLocalidadDept.getText());
+				miConexionXML.getServicio().query("update insert " + depart + " into /departamentos");
+
+				JOptionPane.showMessageDialog(null, "Departamento " + id + " guardado.");
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"El departamento " + id + " ya existe. No se puede volver a insertar");
+			}
+		} catch (XMLDBException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private boolean existsDepartamento(int id) {
 		try {
 
@@ -358,7 +377,7 @@ public class Ejercicio1Practica extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void limpiar() {
 		txtNumeroDept.setText("");
 		txtNombreDept.setText("");
